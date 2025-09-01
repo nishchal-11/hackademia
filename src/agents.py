@@ -140,3 +140,78 @@ Please provide the corrected version of this code that addresses all the issues 
             
         except Exception as e:
             return f"Error during correction: {str(e)}"
+
+
+class TestGeneratorAgent:
+    """
+    AI Agent that generates unit tests for Python code using pytest framework.
+    """
+    
+    def __init__(self):
+        # Initialize the Gemini model
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError("GOOGLE_API_KEY not found in environment variables")
+            
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash",
+            google_api_key=api_key,
+            temperature=0.2  # Slightly higher temperature for creative test generation
+        )
+    
+    def generate_tests(self, code: str) -> str:
+        """
+        Generate comprehensive unit tests for the provided Python code.
+        
+        Args:
+            code: Python code string to generate tests for
+            
+        Returns:
+            pytest test code as a string
+        """
+        system_prompt = """You are an expert Python test engineer specializing in pytest framework.
+        
+        Your task is to generate comprehensive unit tests for the provided Python code.
+        
+        Guidelines:
+        1. Use pytest framework syntax
+        2. Cover normal cases, edge cases, and error conditions
+        3. Test all public functions and methods
+        4. Include tests for exception handling
+        5. Use descriptive test function names (test_function_name_scenario)
+        6. Add assertions for expected outputs
+        7. Test boundary conditions (empty inputs, None values, etc.)
+        8. Include fixture setup if needed
+        
+        Format:
+        - Import necessary modules (pytest, the code being tested)
+        - Write test functions with clear names
+        - Use proper assertions (assert, pytest.raises)
+        - Add docstrings for complex test scenarios
+        
+        Return ONLY the pytest test code, properly formatted and ready to run.
+        Do not include explanations or markdown formatting - just the clean Python test code."""
+
+        human_prompt = f"""Generate comprehensive pytest unit tests for this Python code:
+
+```python
+{code}
+```
+
+Make sure to test:
+- Normal functionality
+- Edge cases (empty inputs, None values, zero values)
+- Error conditions and exceptions
+- Boundary conditions"""
+
+        try:
+            messages = [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=human_prompt)
+            ]
+            
+            response = self.llm.invoke(messages)
+            return response.content
+            
+        except Exception as e:
+            return f"Error during test generation: {str(e)}"
