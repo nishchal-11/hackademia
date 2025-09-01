@@ -1,7 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
-from agents import AnalysisAgent
+from agents import AnalysisAgent, CorrectionAgent
 
 # Load environment variables
 load_dotenv()
@@ -32,24 +32,40 @@ class User:
 
 def main():
     print("Hello, Hackademia!")
-    print("Stage 2: Analysis Agent - Starting...")
+    print("Stage 3: Analysis + Correction Agents - Starting...")
     
     # Get sample code (simulating PR code)
     code_to_analyze = get_sample_code()
-    print(f"\nCode to analyze:\n{code_to_analyze}")
+    print(f"\nOriginal Code:\n{code_to_analyze}")
     
-    # Initialize and run the Analysis Agent
     try:
+        # Step 1: Analysis Agent
+        print("\n" + "="*50)
+        print("STEP 1: ANALYZING CODE...")
+        print("="*50)
+        
         analysis_agent = AnalysisAgent()
         analysis_result = analysis_agent.analyze_code(code_to_analyze)
-        
-        print("\n" + "="*50)
-        print("ANALYSIS RESULTS:")
-        print("="*50)
         print(analysis_result)
         
+        # Step 2: Correction Agent
+        print("\n" + "="*50)
+        print("STEP 2: GENERATING CORRECTIONS...")
+        print("="*50)
+        
+        correction_agent = CorrectionAgent()
+        corrected_code = correction_agent.correct_code(code_to_analyze, analysis_result)
+        
+        print("CORRECTED CODE:")
+        print("-" * 30)
+        print(corrected_code)
+        
+        print("\n" + "="*50)
+        print("STAGE 3 COMPLETE: Analysis + Correction")
+        print("="*50)
+        
     except Exception as e:
-        print(f"Error in analysis: {str(e)}")
+        print(f"Error in pipeline: {str(e)}")
         sys.exit(1)
 
 if __name__ == "__main__":

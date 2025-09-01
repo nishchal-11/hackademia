@@ -74,3 +74,69 @@ class AnalysisAgent:
             
         except Exception as e:
             return f"Error during analysis: {str(e)}"
+
+
+class CorrectionAgent:
+    """
+    AI Agent that proposes and applies code corrections based on analysis.
+    """
+    
+    def __init__(self):
+        # Initialize the Gemini model
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError("GOOGLE_API_KEY not found in environment variables")
+            
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash",
+            google_api_key=api_key,
+            temperature=0.1  # Low temperature for consistent corrections
+        )
+    
+    def correct_code(self, original_code: str, analysis_report: str) -> str:
+        """
+        Generate corrected code based on the analysis report.
+        
+        Args:
+            original_code: The original Python code
+            analysis_report: The analysis report from AnalysisAgent
+            
+        Returns:
+            Corrected code as a string
+        """
+        system_prompt = """You are an expert Python developer specializing in code correction and improvement.
+        
+        Your task is to fix the issues identified in the analysis report by rewriting the problematic code sections.
+        
+        Guidelines:
+        1. Fix all bugs and logic errors
+        2. Add proper error handling (try-catch blocks, input validation)
+        3. Follow PEP 8 coding standards
+        4. Improve code readability and maintainability
+        5. Add docstrings where missing
+        6. Handle edge cases (e.g., division by zero, empty lists)
+        
+        Return ONLY the corrected Python code, properly formatted and ready to use.
+        Do not include explanations or markdown formatting - just the clean Python code."""
+
+        human_prompt = f"""Original Code:
+```python
+{original_code}
+```
+
+Analysis Report:
+{analysis_report}
+
+Please provide the corrected version of this code that addresses all the issues mentioned in the analysis."""
+
+        try:
+            messages = [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=human_prompt)
+            ]
+            
+            response = self.llm.invoke(messages)
+            return response.content
+            
+        except Exception as e:
+            return f"Error during correction: {str(e)}"
