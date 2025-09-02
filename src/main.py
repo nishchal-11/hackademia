@@ -1,6 +1,10 @@
 import os
 import sys
 from dotenv import load_dotenv
+
+# Add src directory to Python path for imports
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from agents import AnalysisAgent, CorrectionAgent, TestGeneratorAgent
 from github_client import GitHubClient
 from report_formatter import format_report, extract_code_from_response, truncate_text
