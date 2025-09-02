@@ -1,7 +1,9 @@
-# Placeholder workflow file
 name: Hackademia CI/CD
 
-on: [pull_request]
+on: 
+  pull_request:
+  push:
+    branches: [ main ]
 
 jobs:
   hackademia:
@@ -18,4 +20,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run Hackademia
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_PR_NUMBER: ${{ github.event.number }}
         run: python src/main.py

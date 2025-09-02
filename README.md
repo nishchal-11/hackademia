@@ -11,4 +11,4 @@ This project implements an intelligent CI/CD pipeline using AI agents to analyze
 
 ## Usage
 - Push changes to a branch and create a PR to trigger the pipeline.
-<!-- Testing Stage 2: Analysis Agent implementation -->
+<!-- Testing Stage 3: Analysis + Correction Agents implementation -->
